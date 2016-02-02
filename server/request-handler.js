@@ -5,10 +5,11 @@ var defaultCorsHeaders = {
   "access-control-max-age": 10 // Seconds.
 };
 
-var messages = [{
-    text: 'hello',
-    username: 'Me'
-}];
+var messages = [//{
+    //text: 'hello',
+    //username: 'Me'
+//}
+];
 /*************************************************************
 
 You should implement your request handler function in this file.
@@ -38,7 +39,7 @@ exports.requestHandler = function(request, response) {
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
-  console.log("Serving request type " + request.method + " for url " + request.url + " response " + response);
+  console.log("Serving request type " + request.method + " for url " + request.url);
   //console.log(response.keys
 
   // The outgoing status.
@@ -65,24 +66,41 @@ exports.requestHandler = function(request, response) {
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
   //response.end("Hello, World!");
-  if(request.method === 'GET'){
-    response.writeHead(statusCode, headers);
-    var results = {
-      results: messages
-    };
-    
-    response.end(JSON.stringify(results));
-
-    //start working here!
-
-  } else if (request.method === 'POST'){
-      response.writeHead(201, headers);
-      response.end(JSON.stringify('POST'));
-  } else if (request.method === 'OPTIONS'){
-      console.log('options request');
-      response.writeHead(statusCode, headers);
-      //response.results = [];
-      response.end(JSON.stringify('OPTIONS'));
+  
+  if(request.url.substring(0,8) === '/classes' || request.url === '/classes/chatterbox/' || request.url === '/log'){
+    if(request.method === 'GET'){
+        response.writeHead(statusCode, headers);
+        var results = {
+          results: messages
+        };
+        
+        response.end(JSON.stringify(results));
+    } else if (request.method === 'POST'){
+        response.writeHead(201, headers);
+        var currentData = '';
+        request.on('data', function(data){
+          currentData += data;
+        });
+        request.on('end', function(){
+          // Convert currentData from string into object
+          // Push into messages array
+          messages.push(JSON.parse(currentData));
+          var results = {
+            results: messages
+          }
+          // In order to post, stringify results object
+          response.end(JSON.stringify(results));
+        });
+    } else if (request.method === 'OPTIONS'){
+        console.log('options request');
+        response.writeHead(statusCode, headers);
+        //response.results = [];
+        response.end(JSON.stringify('OPTIONS'));
+    } 
+  }
+  else{
+      response.writeHead(404, headers);
+      response.end();
   }
 };
 

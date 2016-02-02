@@ -37,13 +37,17 @@ $(function() {
 
       */
 
-      app.fetch(false);
+      app.fetch();
 
       // Poll for new messages
       setInterval(app.fetch, 3000);
     },
     send: function(data) {
-      app.startSpinner();
+
+
+      //app.startSpinner();
+
+
       // Clear messages input
       app.$message.val('');
 
@@ -68,17 +72,17 @@ $(function() {
         url: app.server,
         type: 'GET',
         contentType: 'application/json',
-        //data: { order: '-createdAt'},
+        data: {},
         success: function(data) {
           console.log('chatterbox: Messages fetched');
-
+          console.log(data);
           // Don't bother if we have nothing to work with
           if (!data.results || !data.results.length) { return; }
 
           // Get the last message
           var mostRecentMessage = data.results[data.results.length-1];
           var displayedRoom = $('.chat span').first().data('roomname');
-          app.stopSpinner();
+          //app.stopSpinner();
           // Only bother updating the DOM if we have a new message
           if (mostRecentMessage.objectId !== app.lastMessageId || app.roomname !== displayedRoom) {
             // Update the UI with the fetched rooms
