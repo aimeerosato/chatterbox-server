@@ -1,3 +1,14 @@
+var defaultCorsHeaders = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "access-control-allow-headers": "content-type, accept",
+  "access-control-max-age": 10 // Seconds.
+};
+
+var messages = [{
+    text: 'hello',
+    username: 'Me'
+}];
 /*************************************************************
 
 You should implement your request handler function in this file.
@@ -35,7 +46,6 @@ exports.requestHandler = function(request, response) {
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
-
   // Tell the client we are sending them plain text.
   //
   // You will need to change this if you are sending something
@@ -56,12 +66,24 @@ exports.requestHandler = function(request, response) {
   // node to actually send all the data over to the client.
   //response.end("Hello, World!");
   if(request.method === 'GET'){
-    response.writeHead(200, headers);
-    response.results = [];
-    response.end(JSON.stringify(response));
+    response.writeHead(statusCode, headers);
+    var results = {
+      results: messages
+    };
+    
+    response.end(JSON.stringify(results));
+
+    //start working here!
+
   } else if (request.method === 'POST'){
       response.writeHead(201, headers);
-    }
+      response.end(JSON.stringify('POST'));
+  } else if (request.method === 'OPTIONS'){
+      console.log('options request');
+      response.writeHead(statusCode, headers);
+      //response.results = [];
+      response.end(JSON.stringify('OPTIONS'));
+  }
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -73,12 +95,6 @@ exports.requestHandler = function(request, response) {
 //
 // Another way to get around this restriction is to serve you chat
 // client from this domain by setting up static file serving.
-var defaultCorsHeaders = {
-  "access-control-allow-origin": "*",
-  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "access-control-allow-headers": "content-type, accept",
-  "access-control-max-age": 10 // Seconds.
-};
 
 //calling this wasn't working above
 var handleGET = function () {
